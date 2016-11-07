@@ -8,18 +8,18 @@ import kotlin.time.Duration
  * @param K The key type.
  * @param V The value type.
  */
-class CacheConfig<K, V> {
+public class CacheConfig<K, V> {
     /** Maximum number of entries. When exceeded, the least recently used entry is evicted. */
-    var maxSize: Int = Int.MAX_VALUE
+    public var maxSize: Int = Int.MAX_VALUE
 
     /** Duration after which an entry expires since it was written. Null means no write-based expiry. */
-    var expireAfterWrite: Duration? = null
+    public var expireAfterWrite: Duration? = null
 
     /** Duration after which an entry expires since it was last accessed. Null means no access-based expiry. */
-    var expireAfterAccess: Duration? = null
+    public var expireAfterAccess: Duration? = null
 
     /** Callback invoked when an entry is evicted. */
-    var onEvict: ((K, V) -> Unit)? = null
+    public var onEvict: ((K, V) -> Unit)? = null
 }
 
 /**
@@ -38,7 +38,7 @@ class CacheConfig<K, V> {
  * @param block Configuration block.
  * @return A configured [Cache] instance.
  */
-fun <K, V> cache(block: CacheConfig<K, V>.() -> Unit): Cache<K, V> {
+public fun <K, V> cache(block: CacheConfig<K, V>.() -> Unit): Cache<K, V> {
     val config = CacheConfig<K, V>().apply(block)
     return Cache(config)
 }

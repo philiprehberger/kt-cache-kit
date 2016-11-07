@@ -18,7 +18,7 @@ import java.util.concurrent.atomic.AtomicLong
  * @param V The value type.
  * @param config The cache configuration.
  */
-class Cache<K, V> internal constructor(
+public class Cache<K, V> internal constructor(
     private val config: CacheConfig<K, V>,
 ) {
     private val entries = LinkedHashMap<K, CacheEntry<V>>(16, 0.75f, true)
@@ -34,7 +34,7 @@ class Cache<K, V> internal constructor(
      * @param key The cache key.
      * @return The cached value, or `null`.
      */
-    fun get(key: K): V? {
+    public fun get(key: K): V? {
         synchronized(lock) {
             val entry = entries[key]
             if (entry == null) {
@@ -60,7 +60,7 @@ class Cache<K, V> internal constructor(
      * @param key The cache key.
      * @param value The value to cache.
      */
-    fun put(key: K, value: V) {
+    public fun put(key: K, value: V) {
         synchronized(lock) {
             val existing = entries.remove(key)
             if (existing != null) {
@@ -81,7 +81,7 @@ class Cache<K, V> internal constructor(
      * @param loader Suspend function that loads the value for the given key.
      * @return The cached or freshly loaded value.
      */
-    suspend fun getOrLoad(key: K, loader: suspend (K) -> V): V {
+    public suspend fun getOrLoad(key: K, loader: suspend (K) -> V): V {
         // Fast path: check if value exists
         get(key)?.let { return it }
 
@@ -103,7 +103,7 @@ class Cache<K, V> internal constructor(
      *
      * @param key The key to invalidate.
      */
-    fun invalidate(key: K) {
+    public fun invalidate(key: K) {
         synchronized(lock) {
             val entry = entries.remove(key)
             if (entry != null) {
@@ -115,7 +115,7 @@ class Cache<K, V> internal constructor(
     /**
      * Removes all entries from the cache.
      */
-    fun clear() {
+    public fun clear() {
         synchronized(lock) {
             entries.clear()
         }
@@ -126,7 +126,7 @@ class Cache<K, V> internal constructor(
      *
      * @return A [CacheStats] instance.
      */
-    fun stats(): CacheStats {
+    public fun stats(): CacheStats {
         synchronized(lock) {
             return CacheStats(
                 hits = hitCount.get(),
