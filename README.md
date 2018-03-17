@@ -1,6 +1,6 @@
 # cache-kit
 
-[![CI](https://github.com/philiprehberger/kt-cache-kit/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/kt-cache-kit/actions/workflows/publish.yml)
+[![Tests](https://github.com/philiprehberger/kt-cache-kit/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/kt-cache-kit/actions/workflows/publish.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.philiprehberger/cache-kit)](https://central.sonatype.com/artifact/com.philiprehberger/cache-kit)
 [![License](https://img.shields.io/github/license/philiprehberger/kt-cache-kit)](LICENSE)
 
@@ -11,17 +11,7 @@ Lightweight coroutine-aware in-memory cache with TTL and LRU eviction.
 ### Gradle (Kotlin DSL)
 
 ```kotlin
-dependencies {
-    implementation("com.philiprehberger:cache-kit:0.1.4")
-}
-```
-
-### Gradle (Groovy)
-
-```groovy
-dependencies {
-    implementation 'com.philiprehberger:cache-kit:0.1.0'
-}
+implementation("com.philiprehberger:cache-kit:0.1.5")
 ```
 
 ### Maven
@@ -30,7 +20,7 @@ dependencies {
 <dependency>
     <groupId>com.philiprehberger</groupId>
     <artifactId>cache-kit</artifactId>
-    <version>0.1.4</version>
+    <version>0.1.5</version>
 </dependency>
 ```
 
