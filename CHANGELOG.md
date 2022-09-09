@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.0 (2026-03-31)
+
+- Add `putIfAbsent()` for conditional cache storage
+- Add `getAll()` for batch key lookups
+- Add `invalidateIf()` for predicate-based cache invalidation
+- Add `size()` convenience method for current entry count
+
 ## 0.1.6 (2026-03-31)
 
 - Standardize README to 3-badge format with emoji Support section
