@@ -1,6 +1,6 @@
 # kt-cache-kit
 
-[![CI](https://github.com/philiprehberger/kt-cache-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/philiprehberger/kt-cache-kit/actions/workflows/ci.yml)
+[![CI](https://github.com/philiprehberger/kt-cache-kit/actions/workflows/publish.yml/badge.svg)](https://github.com/philiprehberger/kt-cache-kit/actions/workflows/publish.yml)
 [![Maven Central](https://img.shields.io/maven-central/v/com.philiprehberger/cache-kit)](https://central.sonatype.com/artifact/com.philiprehberger/cache-kit)
 
 Lightweight coroutine-aware in-memory cache with TTL and LRU eviction.
