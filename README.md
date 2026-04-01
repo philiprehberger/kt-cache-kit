@@ -11,7 +11,7 @@ Lightweight coroutine-aware in-memory cache with TTL and LRU eviction.
 ### Gradle (Kotlin DSL)
 
 ```kotlin
-implementation("com.philiprehberger:cache-kit:0.1.5")
+implementation("com.philiprehberger:cache-kit:0.2.0")
 ```
 
 ### Maven
@@ -20,7 +20,7 @@ implementation("com.philiprehberger:cache-kit:0.1.5")
 <dependency>
     <groupId>com.philiprehberger</groupId>
     <artifactId>cache-kit</artifactId>
-    <version>0.1.5</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
@@ -67,6 +67,31 @@ println("Hits: ${stats.hits}, Misses: ${stats.misses}")
 println("Evictions: ${stats.evictions}, Size: ${stats.size}")
 ```
 
+### Conditional Put
+
+```kotlin
+// Only store if not already cached
+val existing = cache.putIfAbsent("user-1", newUser)
+if (existing != null) {
+    println("Already cached: $existing")
+}
+```
+
+### Batch Get
+
+```kotlin
+val users = cache.getAll(listOf("user-1", "user-2", "user-3"))
+// Returns a map of found entries only
+```
+
+### Conditional Invalidation
+
+```kotlin
+// Remove all entries matching a condition
+val removed = cache.invalidateIf { key, _ -> key.startsWith("temp_") }
+println("Removed $removed entries")
+```
+
 ## API
 
 | Class / Function | Description |
@@ -75,6 +100,10 @@ println("Evictions: ${stats.evictions}, Size: ${stats.size}")
 | `Cache<K, V>` | Main cache class with get, put, getOrLoad, invalidate, clear, stats |
 | `CacheConfig<K, V>` | Configuration: maxSize, expireAfterWrite, expireAfterAccess, onEvict |
 | `CacheStats` | Data class with hits, misses, evictions, size, and hitRate |
+| `Cache.putIfAbsent(key, value)` | Store only if key is not already cached |
+| `Cache.getAll(keys)` | Batch get returning map of found entries |
+| `Cache.invalidateIf { }` | Remove entries matching a predicate |
+| `Cache.size()` | Get current number of cached entries |
 
 ## Development
 

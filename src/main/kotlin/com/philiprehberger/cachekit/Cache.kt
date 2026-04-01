@@ -137,6 +137,87 @@ public class Cache<K, V> internal constructor(
         }
     }
 
+    /**
+     * Stores a value only if the key is not already present (or is expired).
+     *
+     * @param key The cache key.
+     * @param value The value to cache.
+     * @return The existing value if the key was already present, or null if the value was stored.
+     */
+    public fun putIfAbsent(key: K, value: V): V? {
+        synchronized(lock) {
+            val existing = entries[key]
+            if (existing != null && !isExpired(existing)) {
+                existing.lastAccessedAt = System.currentTimeMillis()
+                hitCount.incrementAndGet()
+                return existing.value
+            }
+            if (existing != null) {
+                evict(key, existing)
+            }
+            entries[key] = CacheEntry(value)
+            evictIfOverSize()
+            return null
+        }
+    }
+
+    /**
+     * Returns cached values for all given [keys] that are present and not expired.
+     *
+     * @param keys The keys to look up.
+     * @return A map of found entries.
+     */
+    public fun getAll(keys: Collection<K>): Map<K, V> {
+        synchronized(lock) {
+            val result = mutableMapOf<K, V>()
+            for (key in keys) {
+                val entry = entries[key]
+                if (entry != null && !isExpired(entry)) {
+                    entry.lastAccessedAt = System.currentTimeMillis()
+                    hitCount.incrementAndGet()
+                    result[key] = entry.value
+                } else {
+                    if (entry != null) evict(key, entry)
+                    missCount.incrementAndGet()
+                }
+            }
+            return result
+        }
+    }
+
+    /**
+     * Removes all entries matching the given [predicate].
+     *
+     * @param predicate A function that receives the key and value; returns true to invalidate.
+     * @return The number of entries removed.
+     */
+    public fun invalidateIf(predicate: (K, V) -> Boolean): Int {
+        synchronized(lock) {
+            val toRemove = entries.entries
+                .filter { (key, entry) -> predicate(key, entry.value) }
+                .map { it.key }
+            for (key in toRemove) {
+                val entry = entries.remove(key)
+                if (entry != null) {
+                    evictionCount.incrementAndGet()
+                    config.onEvict?.invoke(key, entry.value)
+                }
+            }
+            return toRemove.size
+        }
+    }
+
+    /**
+     * Returns the current number of entries in the cache.
+     *
+     * @return The cache size.
+     */
+    public fun size(): Int {
+        synchronized(lock) {
+            return entries.size
+        }
+    }
+
     private fun isExpired(entry: CacheEntry<V>): Boolean {
         val now = System.currentTimeMillis()
         config.expireAfterWrite?.let { ttl ->

@@ -161,4 +161,93 @@ class CacheTest {
         val c = cache<String, Int> {}
         assertEquals(0.0, c.stats().hitRate)
     }
+
+    @Test
+    fun `putIfAbsent stores when key is absent`() {
+        val c = cache<String, Int> {}
+        val existing = c.putIfAbsent("a", 1)
+        assertNull(existing)
+        assertEquals(1, c.get("a"))
+    }
+
+    @Test
+    fun `putIfAbsent returns existing when key is present`() {
+        val c = cache<String, Int> {}
+        c.put("a", 1)
+        val existing = c.putIfAbsent("a", 2)
+        assertEquals(1, existing)
+        assertEquals(1, c.get("a"))
+    }
+
+    @Test
+    fun `putIfAbsent stores when existing entry is expired`() {
+        val c = cache<String, String> {
+            expireAfterWrite = 50.milliseconds
+        }
+        c.put("key", "old")
+        Thread.sleep(60)
+        val existing = c.putIfAbsent("key", "new")
+        assertNull(existing)
+        assertEquals("new", c.get("key"))
+    }
+
+    @Test
+    fun `getAll returns found entries`() {
+        val c = cache<String, Int> {}
+        c.put("a", 1)
+        c.put("b", 2)
+        c.put("c", 3)
+        val result = c.getAll(listOf("a", "c", "d"))
+        assertEquals(2, result.size)
+        assertEquals(1, result["a"])
+        assertEquals(3, result["c"])
+        assertNull(result["d"])
+    }
+
+    @Test
+    fun `getAll skips expired entries`() {
+        val c = cache<String, String> {
+            expireAfterWrite = 50.milliseconds
+        }
+        c.put("a", "val-a")
+        c.put("b", "val-b")
+        Thread.sleep(60)
+        c.put("c", "val-c")
+        val result = c.getAll(listOf("a", "b", "c"))
+        assertEquals(1, result.size)
+        assertEquals("val-c", result["c"])
+    }
+
+    @Test
+    fun `invalidateIf removes matching entries`() {
+        val c = cache<String, Int> {}
+        c.put("temp_1", 1)
+        c.put("temp_2", 2)
+        c.put("perm_1", 3)
+        val removed = c.invalidateIf { key, _ -> key.startsWith("temp_") }
+        assertEquals(2, removed)
+        assertNull(c.get("temp_1"))
+        assertNull(c.get("temp_2"))
+        assertEquals(3, c.get("perm_1"))
+    }
+
+    @Test
+    fun `invalidateIf returns zero when nothing matches`() {
+        val c = cache<String, Int> {}
+        c.put("a", 1)
+        val removed = c.invalidateIf { _, v -> v > 100 }
+        assertEquals(0, removed)
+        assertEquals(1, c.get("a"))
+    }
+
+    @Test
+    fun `size returns current entry count`() {
+        val c = cache<String, Int> {}
+        assertEquals(0, c.size())
+        c.put("a", 1)
+        c.put("b", 2)
+        assertEquals(2, c.size())
+        c.invalidate("a")
+        assertEquals(1, c.size())
+    }
 }
